@@ -11,7 +11,6 @@
 
 #define C_VARIANCE 40
 float period = 0; 
-float starting_color;
 bool blue;
 
 ISR(PCINT2_vect){	
@@ -52,6 +51,9 @@ bool checkOtherColor(){
   if (blue){
     return checkYellow();
   } else {
+    // Serial.print(period);
+    // Serial.print(" result of checkBlue");
+    // Serial.println(checkBlue());
     return checkBlue();
   }
 }
@@ -67,7 +69,7 @@ void turnRight(){
 
 void smallTurnRight(){
   PORTD = 0b10010000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn left)
-  delay(70);      //continue turning for half a second
+  delay(200);      //continue turning for half a second
 }
 
 void turnLeft(){
@@ -97,7 +99,6 @@ void setup(){
   getColor();
   Serial.begin(9600);
   Serial.println(period);
-  starting_color = period;
   if (checkBlue()){
     blue = true;
   } else {
@@ -106,13 +107,20 @@ void setup(){
 }
 
 void loop(){
+  int consistent = 0;
   PORTD = 0b01010000;  
   getColor();
   // Serial.println(period);
   //delay(100);
-  while (checkOtherColor() == false){
+  while (consistent < 10){
     getColor();
+    if (checkOtherColor() == true){
+      consistent++;
+    } else { 
+      consistent = 0;
+    }
     while(checkBlack()){
+      backward(4.0);
       smallTurnRight();
       getColor();
     }
