@@ -7,7 +7,7 @@
 #define MS_INCH_CONV_FW 120
 #define MS_INCH_CONV_BW 166 
 #define TURN_R 580
-#define TURN_L 500 
+#define TURN_L 550 
 
 float period = 0; 
 bool blue;
@@ -139,13 +139,21 @@ void setup(){
 
 void loop() {
   forwardUntilBlack();
+  backward(3.0);
   turnLeft();
   forwardUntilMid();
   turnLeft();
   forwardUntilBlack();
-  turnRight();
+  //deposit our blocks first
+  turnLeft();
   forward(6.0);
+
+  //then go to enemy side
+  backward(9.0);
   turnRight();
+  turnRight();
+  turnRight();
+  //sweep
   forwardUntilBlack();
   turnRight();
   forward(18.0);
