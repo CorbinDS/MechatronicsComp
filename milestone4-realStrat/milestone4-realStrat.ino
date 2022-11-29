@@ -35,11 +35,11 @@ int getColor(){
 }
 
 bool checkBlack(){
-  return period > 320.0;
+  return period > 250.0;
 }
 
 bool checkBlue(){
-  return (period > 200.0 && period < 270.0);
+  return (period > 200.0 && period < 240.0);
 }
 
 bool checkYellow(){
@@ -68,8 +68,14 @@ void turnRight(){
 
 void smallTurnRight(){
   PORTD = 0b10010000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn left)
-  delay(200);      //continue turning for half a second
+  delay(80);      //continue turning for a little
 }
+
+void tinyTurnRight(){
+  PORTD = 0b10010000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn left)
+  delay(40);      //continue turning for a little
+}
+
 
 void turnLeft(){
   PORTD = 0b01100000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn right)
@@ -78,15 +84,21 @@ void turnLeft(){
 
 void smallTurnLeft(){
   PORTD = 0b01100000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn left)
-  delay(80);      //continue turning for half a second
+  delay(80);      //continue turning for a little
+}
+
+void tinyTurnLeft(){
+  PORTD = 0b01100000;  //Set port 4 to high, port 5 to low, 7 to high, 6 to low (turn left)
+  delay(40);      //continue turning for a little
 }
 
 void turnAwayFromY(){
   if (blue){
-    smallTurnLeft();
+    tinyTurnLeft();
   } else {
-    smallTurnRight();
+    tinyTurnRight();
   }
+  delay(20);
 }
 
 void turnAwayFromB(){
@@ -95,6 +107,7 @@ void turnAwayFromB(){
   } else {
     smallTurnLeft();
   }
+  delay(20);
 }
 
 void forward(float inches){
@@ -139,15 +152,23 @@ void forwardUntilMid(){
 }
 
 void driveParallel(){
+  PORTD = 0b01010000;  
+  int turnedCount = 0;
   getColor();
   while(checkBlack() == false){
     //If we are straddling the midline and our period drops below 30
     //we are too far in the yellow
-    if (period < 30){ 
-      turnAwayFromYellow();
-    } else if (period > 120) { //If period is greater than 120, we are too far in the blue
-      turnAwayFromBlue();
+    if (turnedCount < 0){
+      if (period < 45){ 
+        turnAwayFromY();
+        turnedCount = 20;
+      } else if (period > 120) { //If period is greater than 120, we are too far in the blue
+        turnAwayFromB();
+        turnedCount = 20;
+      }
     }
+    PORTD = 0b01010000;  
+    turnedCount--;
     getColor();
   }
 }
@@ -169,11 +190,12 @@ void setup(){
 void loop() {
   //Go until we hit the right wall (assumed starting config is facing RIGHT)
   forwardUntilBlack();
-  backward(3.0);
+  backward(1.0);
   
   //Turn towards the midline and go forward until we detect it
   turnLeft();
   forwardUntilMid();
+  forward(2.0);
 
   //Turn to left wall, drive parallel to midline
   turnLeft();
@@ -195,4 +217,5 @@ void loop() {
   forward(40.0);
   turnRight();
   forward(18.0);
+  stop(); //stop
 }
