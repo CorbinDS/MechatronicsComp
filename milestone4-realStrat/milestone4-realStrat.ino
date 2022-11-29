@@ -39,11 +39,11 @@ bool checkBlack(){
 }
 
 bool checkBlue(){
-  return (period > 250.0 && period < 320.0);
+  return (period > 200.0 && period < 270.0);
 }
 
 bool checkYellow(){
-  return (period > 20.0 && period < 50.0);
+  return (period > 15.0 && period < 50.0);
 }
 
 bool checkOtherColor(){
@@ -81,6 +81,21 @@ void smallTurnLeft(){
   delay(80);      //continue turning for half a second
 }
 
+void turnAwayFromY(){
+  if (blue){
+    smallTurnLeft();
+  } else {
+    smallTurnRight();
+  }
+}
+
+void turnAwayFromB(){
+  if (blue){
+    smallTurnRight();
+  } else {
+    smallTurnLeft();
+  }
+}
 
 void forward(float inches){
   PORTD = 0b01010000;  //Set port 5 to high, port 4 to low (forward)
@@ -123,6 +138,20 @@ void forwardUntilMid(){
   }
 }
 
+void driveParallel(){
+  getColor();
+  while(checkBlack() == false){
+    //If we are straddling the midline and our period drops below 30
+    //we are too far in the yellow
+    if (period < 30){ 
+      turnAwayFromYellow();
+    } else if (period > 120) { //If period is greater than 120, we are too far in the blue
+      turnAwayFromBlue();
+    }
+    getColor();
+  }
+}
+
 void setup(){
   delay(5000);  
   initIO();
@@ -138,23 +167,32 @@ void setup(){
 }
 
 void loop() {
+  //Go until we hit the right wall (assumed starting config is facing RIGHT)
   forwardUntilBlack();
   backward(3.0);
+  
+  //Turn towards the midline and go forward until we detect it
   turnLeft();
   forwardUntilMid();
+
+  //Turn to left wall, drive parallel to midline
   turnLeft();
-  forwardUntilBlack();
+  driveParallel();
+
   //deposit our blocks first
   turnLeft();
   forward(6.0);
 
   //then go to enemy side
+  //turning in a way that doesn't push cubes into enemy side
   backward(9.0);
   turnRight();
   turnRight();
   turnRight();
-  //sweep
-  forwardUntilBlack();
+
+  //sweep the entire enemy side of the mid line
+  //then turn to our side, and go forward
+  forward(40.0);
   turnRight();
   forward(18.0);
 }
