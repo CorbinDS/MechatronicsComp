@@ -39,7 +39,7 @@ bool checkBlack(){
 }
 
 bool checkBlue(){
-  return (period > 200.0 && period < 240.0);
+  return (period > 200.0 && period < 230.0);
 }
 
 bool checkYellow(){
@@ -93,16 +93,16 @@ void tinyTurnLeft(){
 }
 
 void turnAwayFromY(){
-  if (blue){
-    tinyTurnLeft();
+  if (!blue){
+    smallTurnLeft();
   } else {
-    tinyTurnRight();
+    smallTurnRight();
   }
   delay(20);
 }
 
 void turnAwayFromB(){
-  if (blue){
+  if (!blue){
     smallTurnRight();
   } else {
     smallTurnLeft();
@@ -144,7 +144,7 @@ void forwardUntilMid(){
     }
     while(checkBlack()){
       backward(4.0);
-      smallTurnLeft();
+      smallTurnRight();
       getColor();
     }
     PORTD = 0b01010000;  
@@ -159,10 +159,10 @@ void driveParallel(){
     //If we are straddling the midline and our period drops below 30
     //we are too far in the yellow
     if (turnedCount < 0){
-      if (period < 45){ 
+      if (period < 55){ 
         turnAwayFromY();
-        turnedCount = 20;
-      } else if (period > 120) { //If period is greater than 120, we are too far in the blue
+        turnedCount = 5;
+      } else if (period > 110) { //If period is greater than 120, we are too far in the blue
         turnAwayFromB();
         turnedCount = 20;
       }
@@ -193,29 +193,33 @@ void loop() {
   backward(1.0);
   
   //Turn towards the midline and go forward until we detect it
-  turnLeft();
+  turnRight();
   forwardUntilMid();
   forward(2.0);
 
   //Turn to left wall, drive parallel to midline
-  turnLeft();
+  turnRight();
   driveParallel();
 
   //deposit our blocks first
-  turnLeft();
+  turnRight();
+  smallTurnRight();
   forward(6.0);
 
   //then go to enemy side
   //turning in a way that doesn't push cubes into enemy side
-  backward(9.0);
-  turnRight();
-  turnRight();
-  turnRight();
+  smallTurnLeft();
+  backward(11.0);
+  turnLeft();
+  turnLeft();
+  turnLeft();
 
   //sweep the entire enemy side of the mid line
   //then turn to our side, and go forward
   forward(40.0);
-  turnRight();
+  turnLeft();
+  smallTurnLeft();
+  smallTurnLeft();
   forward(18.0);
   stop(); //stop
 }
