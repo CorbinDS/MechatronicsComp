@@ -161,8 +161,20 @@ void forwardUntilMidOrBlack(){
   }
   if (checkBlack() == true){
     float starting_p = period;
+
+    smallTurnLeft();
     getColor();
-    float leftDiff;
+    float leftDiff = starting_p - period;
+    
+    smallTurnRight();
+    smallTurnRight();
+    getColor();
+    float rightDiff = starting_p - period;
+    if(leftDiff < 0){
+      while (checkBlack() == true){
+        smallTurnRight();
+      }
+    }
   } else {
     driveParallel();
   }
@@ -246,7 +258,7 @@ void mainProgram() {
   turnLeft();
   turnLeft();
 
-  //forwardUntilMidOrBlack();
+  forwardUntilMidOrBlack();
 }
 
 int main(void){
